@@ -9,9 +9,9 @@ const activeLocks: Record<string, string> = {}; // taskId -> userId
 
 export const initTaskSocket = (io: Server) => {
   io.on("connection", (socket: Socket) => {
-    console.log(`🟢 User connected: ${socket.id}`);
+    console.log(` User connected: ${socket.id}`);
 
-    // 🟠 Lock task
+    // Lock task
     socket.on("lockTask", ({ taskId, userId }) => {
       if (activeLocks[taskId] && activeLocks[taskId] !== userId) {
         socket.emit("lockError", {
@@ -22,39 +22,39 @@ export const initTaskSocket = (io: Server) => {
 
       activeLocks[taskId] = userId;
       io.emit("taskLocked", { taskId, userId });
-      console.log(`🔒 Task ${taskId} locked by ${userId}`);
+      console.log(`Task ${taskId} locked by ${userId}`);
     });
 
-    // 🔵 Unlock task
+    //  Unlock task
     socket.on("unlockTask", ({ taskId, userId }) => {
       if (activeLocks[taskId] === userId) {
         delete activeLocks[taskId];
         io.emit("taskUnlocked", { taskId, userId });
-        console.log(`🔓 Task ${taskId} unlocked by ${userId}`);
+        console.log(` Task ${taskId} unlocked by ${userId}`);
       }
     });
 
-    // 🟢 Task created
+    //  Task created
     socket.on("taskCreated", (task) => {
       io.emit("taskCreated", task);
-      console.log(`🆕 Task created: ${task.title}`);
+      console.log(` Task created: ${task.title}`);
     });
 
-    // 🟣 Task updated
+    // Task updated
     socket.on("taskUpdated", (task) => {
       io.emit("taskUpdated", task);
       console.log(`✏️ Task updated: ${task.id}`);
     });
 
-    // 🔴 Task deleted
+    // Task deleted
     socket.on("taskDeleted", (taskId) => {
       io.emit("taskDeleted", taskId);
-      console.log(`🗑️ Task deleted: ${taskId}`);
+      console.log(` Task deleted: ${taskId}`);
     });
 
-    // 🔌 On disconnect
+    // On disconnect
     socket.on("disconnect", () => {
-      console.log(`🔴 User disconnected: ${socket.id}`);
+      console.log(`User disconnected: ${socket.id}`);
       // release any locks held by disconnected user
       for (const [taskId, userId] of Object.entries(activeLocks)) {
         if (userId === socket.id) {

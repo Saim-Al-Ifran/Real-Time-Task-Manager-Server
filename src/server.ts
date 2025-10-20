@@ -1,6 +1,22 @@
-import { server } from './app';
-const PORT = process.env.PORT || 5000;
+import { createServer } from "http";
+import express from "express";
+import { Server } from "socket.io";
+import { initTaskSocket } from "./sockets/task.socket";
 
-server.listen(PORT, () => {
-  console.log(`Server listening on port ${PORT}`);
+const app = express();
+const server = createServer(app);
+
+const io = new Server(server, {
+  cors: {
+    origin: "*",  
+    methods: ["GET", "POST"],
+  },
+});
+
+initTaskSocket(io);
+
+export {io};
+
+server.listen(5000, () => {
+  console.log("🚀 Server running on http://localhost:5000");
 });
